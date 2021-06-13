@@ -1,0 +1,9 @@
+name: ThirstPlugin
+version: 1.0.0
+main: com.goldfrosch.Thirst.ThirstPlugin
+author: GoldFrosch
+description: Thirst Plugin by GoldFrosch
+
+commands:
+  thirst:
+    description: 플러그인 메인 커맨드입니다!
