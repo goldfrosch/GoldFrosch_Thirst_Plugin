@@ -1,4 +1,27 @@
-테스트: 테스트뭉탱이
-이건테스트:
-  테스트1: 예시1
-  테스트2: 예시2
+#출력 될 채팅의 접두사
+Prefix: "테스트뭉탱이:: "
+
+#특정 행동에 대한 갈증 증가,감소량 설정
+Setting:
+  Cactus:
+    #선인장 먹으면 증가하는 갈증량
+    num: 5
+  Water:
+    #물 마시면 증가하는 갈증량
+    Increment: 3
+    #물 마시는 시간 쿨타임
+    Cooldown: 5
+    #디버프시간 초를 적으면 됨
+    Debuff: 5
+  minus:
+    #Running과 Nether은 각각 1초마다 떨어지는 게이지 수(게이지 수가 100이 되면 갈증량이 1 감소하는 원리)
+    #기본은 0.5씩 감소되게 되어있고 뛰기와 지옥에 있게되면 추가로 감소하는 게이지 수치 설정
+    Running: 0.5
+    Nether: 1.0
+    #Bread는 빵 먹었을 때 갈증량 감소하는 값
+    Bread: 5
+  potion:
+    #Cooking_Time은 물 끓이는 시간이며 초 * 20 을 해서 넣어야함(10초 = 10 * 20 => 200)
+    Cooking_Time: 200
+    #Thirst_Increase는 마셧을때 증가량
+    Thirst_Increase: 10

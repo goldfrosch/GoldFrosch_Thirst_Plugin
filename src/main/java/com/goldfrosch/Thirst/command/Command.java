@@ -58,7 +58,7 @@ public class Command extends AbstractCommand{
       //equalsIgnoreCase로 대소문자 상관없이 하게 만들어주기
       if(label.equalsIgnoreCase("thirst")){
         if (args.length == 0) {
-          player.sendMessage(ChatColor.RED + "명령어의 인자가 너무 적거나 없습니다! " + ChatColor.YELLOW + "/thirst help" + ChatColor.RED + " 명령어를 통해 도움말을 확인할 수 있습니다.");
+          player.sendMessage(ChatColor.RED + plugin.getConfig().getString("Prefix") + "명령어의 인자가 너무 적거나 없습니다! " + ChatColor.YELLOW + "/thirst help" + ChatColor.RED + " 명령어를 통해 도움말을 확인할 수 있습니다.");
         }
         else if(args[0].equalsIgnoreCase("help")){
           player.sendMessage(ChatColor.GRAY + "==================================================");
@@ -70,11 +70,15 @@ public class Command extends AbstractCommand{
         else{
           int thirst = plugin.getThirst().get(player.getUniqueId());
           if(args[0].equalsIgnoreCase("info")){
-            player.sendMessage(ChatColor.AQUA + "Thirst >>" + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + thirst);
+            player.sendMessage(ChatColor.AQUA + plugin.getConfig().getString("Prefix") + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + thirst);
+          }
+          else if(args[0].equalsIgnoreCase("reload")){
+
+            player.sendMessage(ChatColor.AQUA + "Thirst >>" + ChatColor.WHITE + "플러그인 리로드에 성공했습니다");
           }
           else if(args[0].equalsIgnoreCase("testinfo")){
             String gage = new String(new char[thirst/2]).replace("\0", "|");
-            player.sendMessage(ChatColor.AQUA + "Thirst >>" + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + ThirstCautionColor(thirst) + gage + "(" + thirst + "%)");
+            player.sendMessage(ChatColor.AQUA + plugin.getConfig().getString("Prefix") + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + ThirstCautionColor(thirst) + gage + "(" + thirst + "%)");
           }
           else if(args[0].equalsIgnoreCase("add")){
             if (args.length == 1){
@@ -84,25 +88,25 @@ public class Command extends AbstractCommand{
               if(args[1].matches("[+-]?\\d*(\\.\\d+)?")){
                 plugin.getThirst().put(player.getUniqueId(),ThirstCheck(thirst + parseInt(args[1])));
                 thirst = plugin.getThirst().get(player.getUniqueId());
-                player.sendMessage(ChatColor.AQUA + "Thirst >>" + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + thirst);
+                player.sendMessage(ChatColor.AQUA + plugin.getConfig().getString("Prefix") + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + thirst);
               }
               else{
-                player.sendMessage(ChatColor.RED + "뒤에 숫자를 입력해주세요");
+                player.sendMessage(ChatColor.RED + plugin.getConfig().getString("Prefix") + "뒤에 숫자를 입력해주세요");
               }
             }
           }
           else if(args[0].equalsIgnoreCase("del")){
             if (args.length == 1){
-              player.sendMessage(ChatColor.RED + "뒤에 값을 입력해주세요");
+              player.sendMessage(ChatColor.RED + plugin.getConfig().getString("Prefix") + "뒤에 값을 입력해주세요");
             }
             else {
               if(args[1].matches("[+-]?\\d*(\\.\\d+)?")){
                 plugin.getThirst().put(player.getUniqueId(),ThirstCheck(thirst - parseInt(args[1])));
                 thirst = plugin.getThirst().get(player.getUniqueId());
-                player.sendMessage(ChatColor.AQUA + "Thirst >>" + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + thirst);
+                player.sendMessage(ChatColor.AQUA + plugin.getConfig().getString("Prefix") + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + thirst);
               }
               else{
-                player.sendMessage(ChatColor.RED + "뒤에 숫자를 입력해주세요");
+                player.sendMessage(ChatColor.RED + plugin.getConfig().getString("Prefix") + "뒤에 숫자를 입력해주세요");
               }
             }
           }
