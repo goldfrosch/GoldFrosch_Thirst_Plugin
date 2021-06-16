@@ -11,8 +11,6 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -23,7 +21,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import java.io.File;
 import java.util.*;
 
 public class ThirstPlugin extends JavaPlugin implements Listener {
@@ -110,7 +107,8 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
 
         NamespacedKey nc = new NamespacedKey(this, "boiledwater");
 
-        Bukkit.addRecipe(new FurnaceRecipe(nc,BoiledWater, Material.POTION, 10.0F, getConfig().getInt("Setting.potion.CookingTime")));
+        Bukkit.addRecipe(new FurnaceRecipe(nc, BoiledWater, Material.POTION, 0,200));
+
         //플러그인 활성화
         ThirstPlugin.console(ChatColor.YELLOW + pfName + ChatColor.WHITE + " 이(가) 활성화되었습니다!");
         super.onEnable();
@@ -147,6 +145,10 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
             thirst.put(e.getPlayer().getUniqueId(), 100);
             thirst_gage.put(e.getPlayer().getUniqueId(), 100.0);
             water_cooldown.put(e.getPlayer().getUniqueId(), true);
+            getConfig().set("Players."+e.getPlayer().getUniqueId()+".thirst",thirst.get(e.getPlayer().getUniqueId()));
+            getConfig().set("Players."+e.getPlayer().getUniqueId()+".gage",thirst_gage.get(e.getPlayer().getUniqueId()));
+            getConfig().set("Players."+e.getPlayer().getUniqueId()+".cool",water_cooldown.get(e.getPlayer().getUniqueId()));
+            saveConfig();
         }
 
         BukkitScheduler actionbar = getServer().getScheduler();
@@ -165,16 +167,29 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
                 String thirst_gage = new String(new char[gage/2]).replace("\0", "|");
                 e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ThirstCautionColor(gage) + "현재 게이지: " + thirst_gage + "(" + gage + "%)"));
                 //갈증도 낮아짐에 따른 디버프
-                if(gage < 20){
-                    e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.WEAKNESS,100,2)));
-                    e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.HUNGER,100,2)));
-                    e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.SLOW_DIGGING,100,2)));
-                }
-                else if(gage < 40){
+                if(gage < 40){
                     e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.SLOW,100,2)));
+                    if(gage < 20){
+                        e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.WEAKNESS,100,1)));
+                        e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.HUNGER,100,1)));
+                        e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.SLOW_DIGGING,100,1)));
+                    }
                 }
             }
         }, 20L, 20L);
+
+        BukkitScheduler save_thirst = getServer().getScheduler();
+        save_thirst.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                e.getPlayer().sendMessage(ChatColor.AQUA + getConfig().getString("Prefix") + "데이터를 저장중입니다...");
+                getConfig().set("Players."+e.getPlayer().getUniqueId()+".thirst",thirst.get(e.getPlayer().getUniqueId()));
+                getConfig().set("Players."+e.getPlayer().getUniqueId()+".gage",thirst_gage.get(e.getPlayer().getUniqueId()));
+                getConfig().set("Players."+e.getPlayer().getUniqueId()+".cool",water_cooldown.get(e.getPlayer().getUniqueId()));
+                saveConfig();
+                e.getPlayer().sendMessage(ChatColor.AQUA + getConfig().getString("Prefix") + "데이터가 성공적으로 저장되었습니다!");
+            }
+        }, 2400L, 2400L);
     }
 
 //    //걸을때 게이지 떨어지는 활동
@@ -225,11 +240,9 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
         if(e.getPlayer().getLocation().getWorld().getEnvironment().equals(World.Environment.NETHER)){
             gage_bonus_nether.put(e.getPlayer().getUniqueId(),getConfig().getDouble("Setting.minus.nether"));
-            e.getPlayer().sendMessage("지옥에 도착해 추가로 갈증이 소모됩니다");
         }
         else {
             gage_bonus_nether.put(e.getPlayer().getUniqueId(),0.0);
-            e.getPlayer().sendMessage("지옥탈출 남바원");
         }
     }
     //우클릭 이벤트

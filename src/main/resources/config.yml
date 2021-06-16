@@ -22,6 +22,6 @@ Setting:
     Bread: 5
   potion:
     #Cooking_Time은 물 끓이는 시간이며 초 * 20 을 해서 넣어야함(10초 = 10 * 20 => 200)
-    Cooking_Time: 200
+    Cooking_Time: 10
     #Thirst_Increase는 마셧을때 증가량
     Thirst_Increase: 10
