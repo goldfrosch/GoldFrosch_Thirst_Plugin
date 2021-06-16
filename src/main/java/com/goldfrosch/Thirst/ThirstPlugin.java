@@ -40,11 +40,11 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
     }
 
     //Create Hash Map to Thirst
-    HashMap<UUID, Integer> thirst = new HashMap<UUID, Integer>();
-    HashMap<UUID, Double> thirst_gage = new HashMap<UUID, Double>();
-    HashMap<UUID, Boolean> water_cooldown = new HashMap<UUID, Boolean>();
-    HashMap<UUID, Double> gage_bonus_run = new HashMap<UUID, Double>();
-    HashMap<UUID, Double> gage_bonus_nether = new HashMap<UUID, Double>();
+    HashMap<UUID, Integer> thirst = new HashMap<>();
+    HashMap<UUID, Double> thirst_gage = new HashMap<>();
+    HashMap<UUID, Boolean> water_cooldown = new HashMap<>();
+    HashMap<UUID, Double> gage_bonus_run = new HashMap<>();
+    HashMap<UUID, Double> gage_bonus_nether = new HashMap<>();
 
     public HashMap<UUID, Integer> getThirst() {
         return thirst;
@@ -62,7 +62,7 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
 
     public String ThirstCautionColor(int a){
         int b = a / 20;
-        String c = null;
+        String c;
         switch (b){
             case 0:
                 c = ChatColor.DARK_RED + "";
@@ -91,11 +91,12 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
         getCommand(cmd.getcommand()).setExecutor(cmd);
         getCommand(cmd.getcommand()).setTabCompleter(cmd);
 
-        //config파일 저장 후 생성
-        saveConfig();
-        File configFile = new File(getDataFolder(), "config.yml");
-        if(configFile.length() == 0){
+        //config파일 있는지 파악 후 생성
+        if(!getDataFolder().exists()){
             getConfig().options().copyDefaults(true);
+            saveConfig();
+        }
+        else{
             saveConfig();
         }
 
@@ -126,6 +127,7 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
         getConfig().set("Players."+e.getPlayer().getUniqueId()+".thirst",thirst.get(e.getPlayer().getUniqueId()));
         getConfig().set("Players."+e.getPlayer().getUniqueId()+".gage",thirst_gage.get(e.getPlayer().getUniqueId()));
         getConfig().set("Players."+e.getPlayer().getUniqueId()+".cool",water_cooldown.get(e.getPlayer().getUniqueId()));
+        saveConfig();
     }
 
     @EventHandler
@@ -213,7 +215,7 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
         }
         else if(e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.BREAD)){
             e.getPlayer().sendMessage(ChatColor.AQUA + "팡이 너무 퍽퍽해서 마리 잘 안나와오");
-            thirst.put(e.getPlayer().getUniqueId(),thirst.get(e.getPlayer().getUniqueId()) - getConfig().getInt("Setting.minus.bread"));
+            thirst.put(e.getPlayer().getUniqueId(),thirst.get(e.getPlayer().getUniqueId()) - getConfig().getInt("Setting.minus.Bread"));
         }
     }
 
