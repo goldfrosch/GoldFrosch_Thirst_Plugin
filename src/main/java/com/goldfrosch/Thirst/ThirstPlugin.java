@@ -4,6 +4,7 @@ import com.goldfrosch.Thirst.command.Command;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -116,15 +117,21 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        for(Player p: Bukkit.getServer().getOnlinePlayers()){
+            getConfig().set("Users."+p.getUniqueId()+".thirst",thirst.get(p.getUniqueId()));
+            getConfig().set("Users."+p.getUniqueId()+".gage",thirst_gage.get(p.getUniqueId()));
+            getConfig().set("Users."+p.getUniqueId()+".cool",water_cooldown.get(p.getUniqueId()));
+            saveConfig();
+        }
         ThirstPlugin.console(ChatColor.YELLOW + pfName + ChatColor.WHITE + " 이(가) 비활성화되었습니다!");
         super.onDisable();
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e){
-        getConfig().set("Players."+e.getPlayer().getUniqueId()+".thirst",thirst.get(e.getPlayer().getUniqueId()));
-        getConfig().set("Players."+e.getPlayer().getUniqueId()+".gage",thirst_gage.get(e.getPlayer().getUniqueId()));
-        getConfig().set("Players."+e.getPlayer().getUniqueId()+".cool",water_cooldown.get(e.getPlayer().getUniqueId()));
+        getConfig().set("Users."+e.getPlayer().getUniqueId()+".thirst",thirst.get(e.getPlayer().getUniqueId()));
+        getConfig().set("Users."+e.getPlayer().getUniqueId()+".gage",thirst_gage.get(e.getPlayer().getUniqueId()));
+        getConfig().set("Users."+e.getPlayer().getUniqueId()+".cool",water_cooldown.get(e.getPlayer().getUniqueId()));
         saveConfig();
     }
 
@@ -132,22 +139,19 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e){
         gage_bonus_run.put(e.getPlayer().getUniqueId(), 0.0);
         gage_bonus_nether.put(e.getPlayer().getUniqueId(), 0.0);
+        water_cooldown.put(e.getPlayer().getUniqueId(), true);
+        thirst.put(e.getPlayer().getUniqueId(),getConfig().getInt("Users."+e.getPlayer().getUniqueId()+".thirst"));
+        thirst_gage.put(e.getPlayer().getUniqueId(),getConfig().getDouble("Users."+e.getPlayer().getUniqueId()+".gage"));
+
         if(e.getPlayer().getLocation().getWorld().getEnvironment().equals(World.Environment.NETHER)){
             gage_bonus_nether.put(e.getPlayer().getUniqueId(), getConfig().getDouble("Setting.minus.nether"));
         }
 
-        if(e.getPlayer().hasPlayedBefore()){
-            thirst.put(e.getPlayer().getUniqueId(),getConfig().getInt("Players."+e.getPlayer().getUniqueId()+".thirst"));
-            thirst_gage.put(e.getPlayer().getUniqueId(),getConfig().getDouble("Players."+e.getPlayer().getUniqueId()+".gage"));
-            water_cooldown.put(e.getPlayer().getUniqueId(),getConfig().getBoolean("Players."+e.getPlayer().getUniqueId()+".cool"));
-        }
-        else {
+        if(!e.getPlayer().hasPlayedBefore()){
             thirst.put(e.getPlayer().getUniqueId(), 100);
             thirst_gage.put(e.getPlayer().getUniqueId(), 100.0);
-            water_cooldown.put(e.getPlayer().getUniqueId(), true);
-            getConfig().set("Players."+e.getPlayer().getUniqueId()+".thirst",thirst.get(e.getPlayer().getUniqueId()));
-            getConfig().set("Players."+e.getPlayer().getUniqueId()+".gage",thirst_gage.get(e.getPlayer().getUniqueId()));
-            getConfig().set("Players."+e.getPlayer().getUniqueId()+".cool",water_cooldown.get(e.getPlayer().getUniqueId()));
+            getConfig().set("Users."+e.getPlayer().getUniqueId()+".thirst",thirst.get(e.getPlayer().getUniqueId()));
+            getConfig().set("Users."+e.getPlayer().getUniqueId()+".gage",thirst_gage.get(e.getPlayer().getUniqueId()));
             saveConfig();
         }
 
@@ -177,19 +181,6 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
                 }
             }
         }, 20L, 20L);
-
-        BukkitScheduler save_thirst = getServer().getScheduler();
-        save_thirst.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                e.getPlayer().sendMessage(ChatColor.AQUA + getConfig().getString("Prefix") + "데이터를 저장중입니다...");
-                getConfig().set("Players."+e.getPlayer().getUniqueId()+".thirst",thirst.get(e.getPlayer().getUniqueId()));
-                getConfig().set("Players."+e.getPlayer().getUniqueId()+".gage",thirst_gage.get(e.getPlayer().getUniqueId()));
-                getConfig().set("Players."+e.getPlayer().getUniqueId()+".cool",water_cooldown.get(e.getPlayer().getUniqueId()));
-                saveConfig();
-                e.getPlayer().sendMessage(ChatColor.AQUA + getConfig().getString("Prefix") + "데이터가 성공적으로 저장되었습니다!");
-            }
-        }, 2400L, 2400L);
     }
 
 //    //걸을때 게이지 떨어지는 활동
@@ -212,7 +203,6 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
         else if(!e.isSprinting()){
             gage_bonus_run.put(e.getPlayer().getUniqueId(),0.0);
         }
-
     }
 
     @EventHandler

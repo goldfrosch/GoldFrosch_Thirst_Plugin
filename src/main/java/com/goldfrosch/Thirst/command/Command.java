@@ -73,7 +73,8 @@ public class Command extends AbstractCommand{
             player.sendMessage(ChatColor.AQUA + plugin.getConfig().getString("Prefix") + ChatColor.WHITE + player.getName() + "님의 " + "현재 갈증량 :" + thirst);
           }
           else if(args[0].equalsIgnoreCase("reload")){
-
+            plugin.getConfig().get("Prefix");
+            plugin.getConfig().getConfigurationSection("Setting");
             player.sendMessage(ChatColor.AQUA + "Thirst >>" + ChatColor.WHITE + "플러그인 리로드에 성공했습니다");
           }
           else if(args[0].equalsIgnoreCase("testinfo")){
