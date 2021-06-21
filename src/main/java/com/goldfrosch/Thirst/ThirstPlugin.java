@@ -79,7 +79,6 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
         }
         return c;
     }
-
     @Override
     public void onEnable() {
         //이벤트 사용 선언
@@ -108,7 +107,7 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
 
         NamespacedKey nc = new NamespacedKey(this, "boiledwater");
 
-        Bukkit.addRecipe(new FurnaceRecipe(nc, BoiledWater, Material.POTION, 0,200));
+        Bukkit.addRecipe(new FurnaceRecipe(nc, BoiledWater, Material.POTION, 0, getConfig().getInt("Setting.potion.Cooking_Time")));
 
         //플러그인 활성화
         ThirstPlugin.console(ChatColor.YELLOW + pfName + ChatColor.WHITE + " 이(가) 활성화되었습니다!");
@@ -156,27 +155,38 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
         }
 
         BukkitScheduler actionbar = getServer().getScheduler();
+
         actionbar.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-                //1초마다 목마름 게이지에 영향을 주는 게이지가 내려감
-                thirst_gage.put(e.getPlayer().getUniqueId(), thirst_gage.get(e.getPlayer().getUniqueId()) - (0.5 + gage_bonus_run.get(e.getPlayer().getUniqueId()) + gage_bonus_nether.get(e.getPlayer().getUniqueId())));
-                //목마름 게이지에 영향을 주는 게이지가 0일때에 대한 행동
-                if(thirst_gage.get(e.getPlayer().getUniqueId()) <= 0){
-                    thirst.put(e.getPlayer().getUniqueId(), thirst.get(e.getPlayer().getUniqueId()) - 1);
-                    thirst_gage.put(e.getPlayer().getUniqueId(), 100.0);
+                Boolean world_check = true;
+
+                for(String world : getConfig().getStringList("Setting.Worlds")){
+                    if(e.getPlayer().getWorld().getName().equals(world)){
+                        world_check = false;
+                    }
                 }
-                int gage = ThirstCheck(thirst.get(e.getPlayer().getUniqueId()));
-                //액션바 생성
-                String thirst_gage = new String(new char[gage/2]).replace("\0", "|");
-                e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ThirstCautionColor(gage) + "현재 게이지: " + thirst_gage + "(" + gage + "%)"));
-                //갈증도 낮아짐에 따른 디버프
-                if(gage < 40){
-                    e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.SLOW,100,2)));
-                    if(gage < 20){
-                        e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.WEAKNESS,100,1)));
-                        e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.HUNGER,100,1)));
-                        e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.SLOW_DIGGING,100,1)));
+                if(world_check){
+                    //1초마다 목마름 게이지에 영향을 주는 게이지가 내려감
+                    thirst_gage.put(e.getPlayer().getUniqueId(), thirst_gage.get(e.getPlayer().getUniqueId()) - (0.5 + gage_bonus_run.get(e.getPlayer().getUniqueId()) + gage_bonus_nether.get(e.getPlayer().getUniqueId())));
+                    //목마름 게이지에 영향을 주는 게이지가 0일때에 대한 행동
+                    if(thirst_gage.get(e.getPlayer().getUniqueId()) <= 0){
+                        thirst.put(e.getPlayer().getUniqueId(), thirst.get(e.getPlayer().getUniqueId()) - 1);
+                        thirst_gage.put(e.getPlayer().getUniqueId(), 100.0);
+                    }
+                    int gage = ThirstCheck(thirst.get(e.getPlayer().getUniqueId()));
+                    //액션바 생성
+                    String thirst_gage = new String(new char[gage/2]).replace("\0", "|");
+                    e.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ThirstCautionColor(gage) + "현재 게이지: " + thirst_gage + "(" + gage + "%)"));
+                    //갈증도 낮아짐에 따른 디버프
+                    if(gage < 40){
+                        e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.SLOW,100,2)));
+                        if(gage < 20){
+                            int potion_duration = getConfig().getInt("Setting.thirst.buff_power") - 1;
+                            e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.WEAKNESS,100,potion_duration)));
+                            e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.HUNGER,100,potion_duration)));
+                            e.getPlayer().addPotionEffect((new PotionEffect(PotionEffectType.SLOW_DIGGING,100,potion_duration)));
+                        }
                     }
                 }
             }
@@ -217,10 +227,6 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
 
         if(e.getPlayer().getInventory().getItemInMainHand().equals(BoiledWater)){
             thirst.put(e.getPlayer().getUniqueId(),thirst.get(e.getPlayer().getUniqueId()) + getConfig().getInt("Setting.potion.Thirst_Increase"));
-        }
-        else if(e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.BREAD)){
-            e.getPlayer().sendMessage(ChatColor.AQUA + "팡이 너무 퍽퍽해서 마리 잘 안나와오");
-            thirst.put(e.getPlayer().getUniqueId(),thirst.get(e.getPlayer().getUniqueId()) - getConfig().getInt("Setting.minus.Bread"));
         }
     }
 

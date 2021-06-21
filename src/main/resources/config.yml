@@ -13,15 +13,20 @@ Setting:
     Cooldown: 5
     #디버프시간 초를 적으면 됨
     Debuff: 5
+  thirst:
+    #갈증 20% 미만으로 내려갈때의 디버프 파워
+    buff_power: 1
   minus:
     #Running과 Nether은 각각 1초마다 떨어지는 게이지 수(게이지 수가 100이 되면 갈증량이 1 감소하는 원리)
     #기본은 0.5씩 감소되게 되어있고 뛰기와 지옥에 있게되면 추가로 감소하는 게이지 수치 설정
     Running: 0.5
     Nether: 1.0
-    #Bread는 빵 먹었을 때 갈증량 감소하는 값
-    Bread: 5
   potion:
-    #Cooking_Time은 물 끓이는 시간이며 초 * 20 을 해서 넣어야함(10초 = 10 * 20 => 200)
+    #Cooking_Time
     Cooking_Time: 10
     #Thirst_Increase는 마셧을때 증가량
     Thirst_Increase: 10
+  Worlds:
+    - this
+    - is
+    - example
