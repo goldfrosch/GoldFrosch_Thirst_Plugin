@@ -168,7 +168,7 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
                 }
                 if(world_check){
                     //1초마다 목마름 게이지에 영향을 주는 게이지가 내려감
-                    thirst_gage.put(e.getPlayer().getUniqueId(), thirst_gage.get(e.getPlayer().getUniqueId()) - (0.5 + gage_bonus_run.get(e.getPlayer().getUniqueId()) + gage_bonus_nether.get(e.getPlayer().getUniqueId())));
+                    thirst_gage.put(e.getPlayer().getUniqueId(), thirst_gage.get(e.getPlayer().getUniqueId()) - (getConfig().getDouble("Setting.minus.Default") + gage_bonus_run.get(e.getPlayer().getUniqueId()) + gage_bonus_nether.get(e.getPlayer().getUniqueId())));
                     //목마름 게이지에 영향을 주는 게이지가 0일때에 대한 행동
                     if(thirst_gage.get(e.getPlayer().getUniqueId()) <= 0){
                         thirst.put(e.getPlayer().getUniqueId(), thirst.get(e.getPlayer().getUniqueId()) - 1);

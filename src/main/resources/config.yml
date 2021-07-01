@@ -19,6 +19,7 @@ Setting:
   minus:
     #Running과 Nether은 각각 1초마다 떨어지는 게이지 수(게이지 수가 100이 되면 갈증량이 1 감소하는 원리)
     #기본은 0.5씩 감소되게 되어있고 뛰기와 지옥에 있게되면 추가로 감소하는 게이지 수치 설정
+    Default: 0.5
     Running: 0.5
     Nether: 1.0
   potion:
