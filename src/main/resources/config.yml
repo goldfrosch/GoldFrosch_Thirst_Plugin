@@ -6,6 +6,7 @@ Setting:
   Cactus:
     #선인장 먹으면 증가하는 갈증량
     num: 5
+    durability: 1
   Water:
     #물 마시면 증가하는 갈증량
     Increment: 3

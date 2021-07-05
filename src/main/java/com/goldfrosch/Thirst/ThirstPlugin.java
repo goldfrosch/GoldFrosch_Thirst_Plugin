@@ -12,6 +12,8 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -244,21 +246,27 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
     //우클릭 이벤트
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e){
+
         if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             //선인장 뭉탱이
             if(e.getClickedBlock().getType().equals(Material.CACTUS) && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.SHEARS)){
                 thirst.put(e.getPlayer().getUniqueId(), ThirstCheck(thirst.get(e.getPlayer().getUniqueId()) + getConfig().getInt("Setting.Cactus.num")));
                 e.getClickedBlock().setType(Material.AIR);
                 e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_WANDERING_TRADER_DRINK_POTION,1f,1f);
+
+                ItemMeta meta = e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
+                Damageable damageable = (Damageable) meta;
+                e.getPlayer().sendMessage(" " + damageable.getDamage());
+                damageable.setDamage(damageable.getDamage() + getConfig().getInt("Setting.Cactus.durability"));
+                e.getPlayer().getInventory().getItemInMainHand().setItemMeta((ItemMeta) damageable);
             }
             //물마시기 뭉탱이
-            else if(e.getClickedBlock().getRelative(e.getBlockFace()).getType() == Material.WATER){
+            else if(e.getClickedBlock().getRelative(e.getBlockFace()).getType() == Material.WATER && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.AIR)){
                 //물마시기 쿨타임 타이머 생성
                 Timer timer = new Timer();
                 TimerTask TTask = new TimerTask() {
                     @Override
-                    public void run() {
-                        water_cooldown.put(e.getPlayer().getUniqueId(), true);
+                    public void run() { water_cooldown.put(e.getPlayer().getUniqueId(), true);
                     }
                 };
                 //조건 생성 5초 뒤에 true로 변경
