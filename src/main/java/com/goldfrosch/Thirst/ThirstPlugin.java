@@ -246,7 +246,6 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
     //우클릭 이벤트
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e){
-
         if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             //선인장 뭉탱이
             if(e.getClickedBlock().getType().equals(Material.CACTUS) && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.SHEARS)){
@@ -256,12 +255,15 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
 
                 ItemMeta meta = e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
                 Damageable damageable = (Damageable) meta;
-                e.getPlayer().sendMessage(" " + damageable.getDamage());
                 damageable.setDamage(damageable.getDamage() + getConfig().getInt("Setting.Cactus.durability"));
                 e.getPlayer().getInventory().getItemInMainHand().setItemMeta((ItemMeta) damageable);
+                //내구도 0이 될때 제거 최대 내구도 구하는 메소드를 찾으면 변경할 것
+                if(damageable.getDamage() >= 238){
+                    e.getPlayer().getInventory().getItemInMainHand().setType(Material.AIR);
+                }
             }
             //물마시기 뭉탱이
-            else if(e.getClickedBlock().getRelative(e.getBlockFace()).getType() == Material.WATER && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.AIR)){
+            else if(e.getClickedBlock().getRelative(e.getBlockFace()).getType() == Material.WATER){
                 //물마시기 쿨타임 타이머 생성
                 Timer timer = new Timer();
                 TimerTask TTask = new TimerTask() {
@@ -269,8 +271,7 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
                     public void run() { water_cooldown.put(e.getPlayer().getUniqueId(), true);
                     }
                 };
-                //조건 생성 5초 뒤에 true로 변경
-                if(water_cooldown.get(e.getPlayer().getUniqueId())) {
+                if(water_cooldown.get(e.getPlayer().getUniqueId()) && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
                     water_cooldown.put(e.getPlayer().getUniqueId(), false);
                     timer.schedule(TTask,getConfig().getInt("Setting.Water.Cooldown") * 1000);
                     thirst.put(e.getPlayer().getUniqueId(), ThirstCheck(thirst.get(e.getPlayer().getUniqueId()) + getConfig().getInt("Setting.Water.Increment")));
