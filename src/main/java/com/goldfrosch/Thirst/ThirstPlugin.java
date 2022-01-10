@@ -248,22 +248,25 @@ public class ThirstPlugin extends JavaPlugin implements Listener {
     public void onPlayerInteract(PlayerInteractEvent e){
         if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
             //선인장 뭉탱이
-            if(e.getClickedBlock().getType().equals(Material.CACTUS) && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.SHEARS)){
+            if(e.getClickedBlock().getType().equals(Material.CACTUS) && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.SHEARS)) {
                 thirst.put(e.getPlayer().getUniqueId(), ThirstCheck(thirst.get(e.getPlayer().getUniqueId()) + getConfig().getInt("Setting.Cactus.num")));
                 e.getClickedBlock().setType(Material.AIR);
-                e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_WANDERING_TRADER_DRINK_POTION,1f,1f);
+                e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENTITY_WANDERING_TRADER_DRINK_POTION, 1f, 1f);
 
                 ItemMeta meta = e.getPlayer().getInventory().getItemInMainHand().getItemMeta();
                 Damageable damageable = (Damageable) meta;
                 damageable.setDamage(damageable.getDamage() + getConfig().getInt("Setting.Cactus.durability"));
                 e.getPlayer().getInventory().getItemInMainHand().setItemMeta((ItemMeta) damageable);
+
                 //내구도 0이 될때 제거 최대 내구도 구하는 메소드를 찾으면 변경할 것
-                if(damageable.getDamage() >= 238){
+                if (damageable.getDamage() >= 238) {
                     e.getPlayer().getInventory().getItemInMainHand().setType(Material.AIR);
                 }
             }
-            //물마시기 뭉탱이
-            else if(e.getClickedBlock().getRelative(e.getBlockFace()).getType() == Material.WATER){
+        }
+        else if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
+            if(e.getClickedBlock().getRelative(e.getBlockFace()).getType().equals(Material.WATER)
+            && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.GLASS_BOTTLE)){
                 //물마시기 쿨타임 타이머 생성
                 Timer timer = new Timer();
                 TimerTask TTask = new TimerTask() {
